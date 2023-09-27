@@ -21,7 +21,7 @@ use tauri::{
 };
 
 pub use fern;
-use time::OffsetDateTime;
+use time::{OffsetDateTime, Date};
 
 const DEFAULT_MAX_FILE_SIZE: u128 = 40000;
 const DEFAULT_ROTATION_STRATEGY: RotationStrategy = RotationStrategy::KeepOne;
@@ -306,7 +306,9 @@ impl Builder {
                             .into()
                         }
                         LogTarget::LogDir => {
-                            let path = app_handle.path_resolver().app_log_dir().unwrap();
+                            let data = TimezoneStrategy::UseLocal.get_now();
+                            let date = data.to_string().replace(" ", "_");
+                            let path = app_handle.path_resolver().app_log_dir().unwrap().join(date);
                             if !path.exists() {
                                 fs::create_dir_all(&path).unwrap();
                             }
